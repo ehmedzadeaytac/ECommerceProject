@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "ecommerceafternoon.client", "ecommerceafternoon.client\ecommerceafternoon.client.esproj", "{00392197-F83C-980F-2B92-7D602AF6D5BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerceAfternoon.Server", "ECommerceAfternoon.Server\ECommerceAfternoon.Server.csproj", "{F786FA60-5973-4C7C-A2A1-02AD89D19F10}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00392197-F83C-980F-2B92-7D602AF6D5BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00392197-F83C-980F-2B92-7D602AF6D5BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00392197-F83C-980F-2B92-7D602AF6D5BB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{00392197-F83C-980F-2B92-7D602AF6D5BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00392197-F83C-980F-2B92-7D602AF6D5BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00392197-F83C-980F-2B92-7D602AF6D5BB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{F786FA60-5973-4C7C-A2A1-02AD89D19F10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F786FA60-5973-4C7C-A2A1-02AD89D19F10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F786FA60-5973-4C7C-A2A1-02AD89D19F10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F786FA60-5973-4C7C-A2A1-02AD89D19F10}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E7681497-415E-4685-BFFB-2C875581C25C}
+	EndGlobalSection
+EndGlobal
