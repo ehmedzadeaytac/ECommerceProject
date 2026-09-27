@@ -15,5 +15,6 @@
         public int PageSize { get; set; } = 12;
 
         public string Sort { get; set; } = "newest";
+        public bool OnlyDiscounted { get; set; } = false;
     }
 }

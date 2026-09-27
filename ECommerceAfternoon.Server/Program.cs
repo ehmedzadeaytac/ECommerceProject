@@ -29,8 +29,10 @@ namespace ECommerceAfternoon.Server
                 options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnection"));
             });
 
-            builder.Services.AddCors(options => {
-                options.AddPolicy("ReactPolicy", policy => {
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("ReactPolicy", policy =>
+                {
                     policy.WithOrigins("http://localhost:5173")
                     .AllowAnyHeader()
                     .AllowAnyMethod();
@@ -52,6 +54,7 @@ namespace ECommerceAfternoon.Server
             app.UseHttpsRedirection();
 
             app.UseCors("ReactPolicy");
+
 
             app.UseAuthorization();
 

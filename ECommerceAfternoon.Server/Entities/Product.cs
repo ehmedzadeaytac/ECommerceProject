@@ -11,5 +11,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int CategoryId { get; set; }
         public Category Category { get; set; } = null!;
+        public int ViewCount { get; set; } = 0;
+        public decimal DiscountPercent { get; set; } = 0;
     }
 }

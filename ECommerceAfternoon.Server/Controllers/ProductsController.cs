@@ -4,7 +4,7 @@ using ECommerceAfternoon.Server.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using ECommerceAfternoon.Server.DTOs.Review;
 namespace ECommerceAfternoon.Server.Controllers
 {
     [ApiController]
@@ -51,7 +51,10 @@ namespace ECommerceAfternoon.Server.Controllers
                 productsQuery = productsQuery.Where(x =>
                     x.Price <= query.MaxPrice.Value);
             }
-
+            if (query.OnlyDiscounted)
+            {
+                productsQuery = productsQuery.Where(x => x.DiscountPercent > 0);
+            }
             productsQuery = query.Sort.ToLower() switch
             {
                 "priceasc" =>
@@ -87,7 +90,9 @@ namespace ECommerceAfternoon.Server.Controllers
                     Stock = x.Stock,
                     ImageUrl = x.ImageUrl,
                     CategoryId = x.CategoryId,
-                    CategoryName = x.Category.Name
+                    CategoryName = x.Category.Name,
+                    ViewCount = x.ViewCount,
+                    DiscountPercent = x.DiscountPercent 
                 })
                 .ToListAsync();
 
@@ -105,19 +110,104 @@ namespace ECommerceAfternoon.Server.Controllers
 
             return Ok(result);
         }
-
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
             var product = await _context.Products
-                .AsNoTracking()
                 .Include(x => x.Category)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (product is null)
                 return NotFound();
 
+            product.ViewCount++;
+            await _context.SaveChangesAsync();
+
             return Ok(product);
+        }
+        [HttpPost("{productId:int}/reviews")]
+        public async Task<IActionResult> AddReview(
+    int productId,
+    CreateProductReviewDto dto)
+        {
+            var productExists = await _context.Products
+                .AnyAsync(x => x.Id == productId);
+
+            if (!productExists)
+                return NotFound("Product does not exist.");
+
+            var review = new ProductReview
+            {
+                ProductId = productId,
+                UserId = dto.UserId,
+                Rating = dto.Rating,
+                Comment = dto.Comment
+            };
+
+            _context.ProductReviews.Add(review);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new ProductReviewDto
+            {
+                Id = review.Id,
+                UserId = review.UserId,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreatedAt = review.CreatedAt
+            });
+        }
+
+        [HttpGet("{productId:int}/reviews")]
+        public async Task<IActionResult> GetReviews(int productId)
+        {
+            var reviews = await _context.ProductReviews
+                .AsNoTracking()
+                .Where(x => x.ProductId == productId)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new ProductReviewDto
+                {
+                    Id = x.Id,
+                    UserId = x.UserId,
+                    Rating = x.Rating,
+                    Comment = x.Comment,
+                    CreatedAt = x.CreatedAt
+                })
+                .ToListAsync();
+
+            var result = new ProductReviewsResponseDto
+            {
+                AverageRating = reviews.Count > 0
+                    ? Math.Round(reviews.Average(x => x.Rating), 1)
+                    : 0,
+                TotalReviews = reviews.Count,
+                Reviews = reviews
+            };
+
+            return Ok(result);
+        }
+        [HttpGet("most-viewed")]
+        public async Task<IActionResult> GetMostViewed([FromQuery] int count = 8)
+        {
+            var products = await _context.Products
+                .AsNoTracking()
+                .Include(x => x.Category)
+                .OrderByDescending(x => x.ViewCount)
+                .Take(count)
+                .Select(x => new ProductListDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Price = x.Price,
+                    Stock = x.Stock,
+                    ImageUrl = x.ImageUrl,
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.Category.Name,
+                    ViewCount = x.ViewCount
+                })
+                .ToListAsync();
+
+            return Ok(products);
         }
 
         [HttpPost]
@@ -136,7 +226,8 @@ namespace ECommerceAfternoon.Server.Controllers
                 Price = dto.Price,
                 Stock = dto.Stock,
                 ImageUrl = dto.ImageUrl,
-                CategoryId = dto.CategoryId
+                CategoryId = dto.CategoryId,
+                DiscountPercent = dto.DiscountPercent
             };
 
             _context.Products.Add(product);
@@ -173,6 +264,7 @@ namespace ECommerceAfternoon.Server.Controllers
             product.Stock = dto.Stock;
             product.ImageUrl = dto.ImageUrl;
             product.CategoryId = dto.CategoryId;
+            product.DiscountPercent = dto.DiscountPercent;
 
             await _context.SaveChangesAsync();
 
@@ -193,6 +285,30 @@ namespace ECommerceAfternoon.Server.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+        [HttpGet("discounted")]
+        public async Task<IActionResult> GetDiscounted()
+        {
+            var products = await _context.Products
+                .AsNoTracking()
+                .Include(x => x.Category)
+                .Where(x => x.DiscountPercent > 0)
+                .OrderByDescending(x => x.DiscountPercent)
+                .Select(x => new ProductListDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Price = x.Price,
+                    Stock = x.Stock,
+                    ImageUrl = x.ImageUrl,
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.Category.Name,
+                    ViewCount = x.ViewCount,
+                    DiscountPercent = x.DiscountPercent
+                })
+                .ToListAsync();
+
+            return Ok(products);
         }
     }
 }
